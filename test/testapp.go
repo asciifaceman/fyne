@@ -4,6 +4,7 @@ package test // import "fyne.io/fyne/test"
 import (
 	"image/color"
 	"net/url"
+	"os/exec"
 	"sync"
 
 	"fyne.io/fyne"
@@ -17,6 +18,7 @@ func init() {
 type testApp struct {
 	driver   *testDriver
 	settings fyne.Settings
+	execCmd  func(name string, arg ...string) *exec.Cmd
 }
 
 func (a *testApp) Icon() fyne.Resource {
@@ -82,13 +84,20 @@ func (a *testApp) Settings() fyne.Settings {
 	return a.settings
 }
 
+func (a *testApp) setExec(exc func(name string, arg ...string) *exec.Cmd) func() {
+	a.execCmd = exc
+	return func() {
+		a.execCmd = exec.Command
+	}
+}
+
 // NewApp returns a new dummy app used for testing..
 // It loads a test driver which creates a virtual window in memory for testing.
 func NewApp() fyne.App {
 	settings := &testSettings{}
 	settings.theme = &dummyTheme{}
 	settings.listenerMutex = &sync.Mutex{}
-	test := &testApp{settings: settings}
+	test := &testApp{settings: settings, execCmd: exec.Command}
 	fyne.SetCurrentApp(test)
 	test.driver = NewDriver().(*testDriver)
 

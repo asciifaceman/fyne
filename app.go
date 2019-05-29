@@ -1,6 +1,9 @@
 package fyne
 
-import "net/url"
+import (
+	"net/url"
+	"os/exec"
+)
 
 // An App is the definition of a graphical application.
 // Apps can have multiple windows, it will exit when the first window to be
@@ -39,6 +42,9 @@ type App interface {
 
 	// Settings return the application settings, determining theme and so on.
 	Settings() Settings
+
+	// setExec configures the exec.Command for injectable test responses
+	setExec(func(name string, arg ...string) *exec.Cmd) func()
 }
 
 var app App
